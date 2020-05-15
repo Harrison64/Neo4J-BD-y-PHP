@@ -1,0 +1,125 @@
+//Nodos para los departamentos
+CREATE
+  (jue {id:101, nombredepart:'Juegos Electronicos', telefono:6581001,ubicacion:'1er Piso',modulo:1}),
+  (Sus {id:102, nombredepart:'Suscribciones', telefono:6581002,ubicacion:'1er Piso',modulo:6}),
+  (cmp {id:103, nombredepart:'Computadoras', telefono:6581003,ubicacion:'1er Piso',modulo:9})
+CREATE CONSTRAINT ON (d:departamento) ASSERT d.id IS UNIQUE
+CREATE CONSTRAINT ON (d:departamento) ASSERT exists(d.id)  
+
+//Nodos para los trabajadores
+CREATE
+  (jua {codigo:1110, nombretra:'Juan Tellez', telefono:3152642, cargo:'Analista', salario:1235000}),
+  (alb {codigo:1111, nombretra:'Alberto Rojas', telefono:3206559, cargo:'Asesor', salario:890562}),
+  (ste {codigo:1210, nombretra:'Stella Sanchez', telefono:3002548, cargo:'Gerente', salario:1123685}),
+  (cri {codigo:1211, nombretra:'Cristian Garcia', telefono:3598006, cargo:'Asesor', salario:910365}),
+  (eva {codigo:1310, nombretra:'Evangelina Cruz', telefono:3965824, cargo:'Ingeniero', salario:2900000}),
+  (pas {codigo:1311, nombretra:'Pastor Sanchez', telefono:3216549, cargo:'Asesor', salario:1659500})
+CREATE CONSTRAINT ON (t:trabajador) ASSERT t.codigo IS UNIQUE
+CREATE CONSTRAINT ON (t:trabajador) ASSERT exists(t.codigo)
+
+//Nodos para los clientes
+CREATE
+  (pep {doc:3265, nombrecli:'Pepito Perez', telefono:38941238}),
+  (jho {doc:9518, nombrecli:'Jhon Pulido', telefono:34569806}),
+  (ale {doc:5614, nombrecli:'Alejandro Moreno', telefono:33006023}),
+  (pao {doc:8723, nombrecli:'Paola Ramirez', telefono:31112546})
+CREATE CONSTRAINT ON (c:cliente) ASSERT c.doc IS UNIQUE
+CREATE CONSTRAINT ON (c:cliente) ASSERT exists(c.doc) 
+
+//Nodos para las ventas
+CREATE
+  (wow {codigo:1001, nombreventa:'Wow', fechavent:'2020-01-28', descrip:'Wow', costo:45000}),
+  (pcn {codigo:1002, nombreventa:'PC', fechavent:'2020-01-28', descrip:'Wow', costo:1350699}),
+  (net {codigo:1003, nombreventa:'Netflix', fechavent:'2020-01-29', descrip:'Wow', costo:27900}),
+  (lol {codigo:1004, nombreventa:'Lol', fechavent:'2020-01-29', descrip:'Wow', costo:28700})
+CREATE CONSTRAINT ON (v:venta) ASSERT v.codigo IS UNIQUE
+CREATE CONSTRAINT ON (v:venta) ASSERT exists(v.codigo)
+
+-----------------------------------------------------------------------------------------------------
+//Añadiendo etiquetas a los diferentes nodos (Se ejecutara linea por linea)
+
+//Departamento
+MATCH (jue{nombredepart:'Juegos Electronicos'}) SET jue:departamento
+MATCH (sus{nombredepart:'Suscribciones'}) SET sus:departamento
+MATCH (cmp{nombredepart:'Computadoras'}) SET cmp:departamento
+
+//Trabajador
+MATCH (jua{nombretra:'Juan Tellez'}) SET jua:trabajador
+MATCH (alb{nombretra:'Alberto Rojas'}) SET alb:trabajador
+MATCH (ste{nombretra:'Stella Sanchez'}) SET ste:trabajador
+MATCH (cri{nombretra:'Cristian Garcia'}) SET cri:trabajador
+MATCH (eva{nombretra:'Evangelina Cruz'}) SET eva:trabajador
+MATCH (pas{nombretra:'Pastor Sanchez'}) SET pas:trabajador
+
+//Cliente
+MATCH (pep{nombrecli:'Pepito Perez'}) SET pep:cliente
+MATCH (jho{nombrecli:'Jhon Pulido'}) SET jho:cliente
+MATCH (ale{nombrecli:'Alejandro Moreno'}) SET ale:cliente
+MATCH (pao{nombrecli:'Paola Ramirez'}) SET pao:cliente
+
+//venta
+MATCH (wow{nombreventa:'Wow'}) SET wow:venta
+MATCH (pcn{nombreventa:'PC'}) SET pcn:venta
+MATCH (net{nombreventa:'Netflix'}) SET net:venta
+MATCH (lol{nombreventa:'Lol'}) SET lol:venta
+
+----------------------------------------------------------------------------------------------
+//Relaciones nodo trabajador 
+
+MATCH (t:trabajador) WHERE t.codigo=1110
+MATCH (d:departamento) WHERE d.id = 101
+CREATE (t)-[:PERTENECE]->(d)
+
+MATCH (t:trabajador) WHERE t.codigo=1111
+MATCH (d:departamento) WHERE d.id = 101
+CREATE (t)-[:PERTENECE]->(d)
+
+MATCH (t:trabajador) WHERE t.codigo=1210
+MATCH (d:departamento) WHERE d.id = 102
+CREATE (t)-[:PERTENECE]->(d)
+
+MATCH (t:trabajador) WHERE t.codigo=1211
+MATCH (d:departamento) WHERE d.id = 102
+CREATE (t)-[:PERTENECE]->(d)
+
+MATCH (t:trabajador) WHERE t.codigo=1310
+MATCH (d:departamento) WHERE d.id = 103
+CREATE (t)-[:PERTENECE]->(d)
+
+MATCH (t:trabajador) WHERE t.codigo=1311
+MATCH (d:departamento) WHERE d.id = 103
+CREATE (t)-[:PERTENECE]->(d)
+
+-----------------------------------------------------------------------------------------------
+MATCH (v:venta) WHERE v.codigo = 1001
+MATCH (t:trabajador) WHERE t.codigo=1111
+CREATE (v)-[:EFECTUO]->(t)
+
+MATCH (v:venta) WHERE v.codigo = 1002
+MATCH (t:trabajador) WHERE t.codigo=1311
+CREATE (v)-[:EFECTUO]->(t)
+
+MATCH (v:venta) WHERE v.codigo = 1003
+MATCH (t:trabajador) WHERE t.codigo=1210
+CREATE (v)-[:EFECTUO]->(t)
+
+MATCH (v:venta) WHERE v.codigo = 1004
+MATCH (t:trabajador) WHERE t.codigo=1110
+CREATE (v)-[:EFECTUO]->(t)
+
+-----------------------------------------------------------------------------------------------
+MATCH (v:venta) WHERE v.codigo=1001
+MATCH (c:cliente) WHERE c.doc =3265
+CREATE (v)-[:REALIZO_A]->(c)
+
+MATCH (v:venta) WHERE v.codigo=1002
+MATCH (c:cliente) WHERE c.doc =9518
+CREATE (v)-[:REALIZO_A]->(c)
+
+MATCH (v:venta) WHERE v.codigo=1003
+MATCH (c:cliente) WHERE c.doc =5614
+CREATE (v)-[:REALIZO_A]->(c)
+
+MATCH (v:venta) WHERE v.codigo=1004
+MATCH (c:cliente) WHERE c.doc =8723
+CREATE (v)-[:REALIZO_A]->(c)
